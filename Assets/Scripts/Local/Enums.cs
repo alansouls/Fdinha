@@ -13,6 +13,7 @@
         PASS,
         GUESS,
         PLAY_CARD,
-        ADD_PLAYER
+        ADD_PLAYER,
+        START_GAME
     }
 }

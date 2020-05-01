@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 
 namespace Assets.Scripts.Messages
 {
+    [Serializable]
     public class MessageModel
     {
         public Guid MessageId { get; set; }

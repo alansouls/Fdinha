@@ -1,7 +1,11 @@
 ﻿using Assets.Scripts.Entites;
+using Assets.Scripts.Local;
+using Assets.Scripts.Messages;
+using Assets.Scripts.Util;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Text.RegularExpressions;
 using UnityEngine;
 using UnityEngine.UI;
@@ -12,14 +16,25 @@ public class PlayerBehavior : MonoBehaviour
     public CardBehaviour Card1;
     public CardBehaviour Card2;
     public CardBehaviour Card3;
-    public MatchController MatchController;
     public Button[] GuessButtons;
+    public Stack<Card> Table { get; set; }
+    public IDictionary<Player, int> Guesses { get; set; }
+    public IDictionary<Player, int> Wins { get; set; }
+    public bool CanPlay;
+    public bool GuessingRound;
+    public GameClient GameClient;
+    public bool Host;
 
     // Start is called before the first frame update
     void Start()
     {
+        Host = false;
+        CanPlay = false;
+        GuessingRound = true;
+        GameClient = new GameClient(7777);
         Player = new Player
         {
+            Id = Guid.NewGuid(),
             Cards = new List<Card>(),
             Lives = 3
         };
@@ -42,15 +57,53 @@ public class PlayerBehavior : MonoBehaviour
         CheckIfCanPlay();
     }
 
+    public void JoinGame(string serverIp)
+    {
+        var ip = IPAddress.Parse(serverIp);
+        Host = true;
+        JoinGame(ip);
+    }
+
+    public void JoinGame(IPAddress serverIp)
+    {
+        GameClient.ServerIp = serverIp;
+        GameClient.ListenServerUpdates();
+        GameClient.SendCommandToServer(new MessageModel
+        {
+            MessageId = Guid.NewGuid(),
+            Action = new ActionObject
+            {
+                Action = Assets.Scripts.Enums.Action.ADD_PLAYER,
+                Player = Player
+            }
+        });
+    }
+
+    public void DefineHost()
+    {
+        Host = true;
+    }
+
     private void CheckIfCanPlay()
     {
-        if (MatchController.CurrentPlayer == Player && !Player.Cards.Any())
-            MatchController.Pass(Player);
+        if (CanPlay && !Player.Cards.Any())
+        {
+            CanPlay = false;
+            GameClient.SendCommandToServer(new MessageModel
+            {
+                MessageId = Guid.NewGuid(),
+                Action = new ActionObject
+                {
+                    Action = Assets.Scripts.Enums.Action.PASS,
+                    Player = Player
+                }
+            });
+        }
     }
 
     private void VerifyIfCanPlay()
     {
-        bool canPlay = MatchController.CurrentPlayer == Player && !MatchController.IsGuessing;
+        bool canPlay = CanPlay && !GuessingRound;
         Card1.CanPlay = canPlay;
         Card2.CanPlay = canPlay;
         Card3.CanPlay = canPlay;
@@ -60,11 +113,11 @@ public class PlayerBehavior : MonoBehaviour
     {
         foreach (var button in GuessButtons)
         {
-            if (MatchController.CurrentPlayer == Player && MatchController.IsGuessing == true && !button.gameObject.activeSelf)
+            if (CanPlay && GuessingRound && !button.gameObject.activeSelf)
             {
                 button.gameObject.SetActive(true);
             }
-            else if ((MatchController.CurrentPlayer != Player || !MatchController.IsGuessing) && button.gameObject.activeSelf)
+            else if ((!CanPlay || !GuessingRound) && button.gameObject.activeSelf)
             {
                 button.gameObject.SetActive(false);
             }
@@ -73,8 +126,17 @@ public class PlayerBehavior : MonoBehaviour
 
     public void MakeGuess(int guess)
     {
-        if (!MatchController.Guess(Player, guess))
-            Debug.Log("Can't guess this quantity, because of that rule");
+        CanPlay = false;
+        GameClient.SendCommandToServer(new MessageModel
+        {
+            MessageId = Guid.NewGuid(),
+            Action = new ActionObject
+            {
+                Action = Assets.Scripts.Enums.Action.GUESS,
+                Guess = guess,
+                Player = Player
+            }
+        });
     }
 
     public void PlayCard1()
@@ -114,7 +176,17 @@ public class PlayerBehavior : MonoBehaviour
     private void PlayCard(Card cardToRemove)
     {
         Player.Cards.Remove(cardToRemove);
-        MatchController.PlayCard(Player, cardToRemove);
+        CanPlay = false;
+        GameClient.SendCommandToServer(new MessageModel
+        {
+            MessageId = Guid.NewGuid(),
+            Action = new ActionObject
+            {
+                Action = Assets.Scripts.Enums.Action.PLAY_CARD,
+                Player = Player,
+                Card = cardToRemove,
+            }
+        });
     }
 
     private void BindCardsToBehaviour(Card card1, Card card2, Card card3)

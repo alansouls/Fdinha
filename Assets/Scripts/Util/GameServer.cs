@@ -1,6 +1,5 @@
 ﻿using Assets.Scripts.Local;
 using Assets.Scripts.Messages;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,13 +9,14 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using UnityEditor.VersionControl;
+using UnityEngine;
 
 namespace Assets.Scripts.Util
 {
     public class GameServer
     {
         private readonly UdpClient _udpClient;
-        private int listenPort;
+        private readonly int listenPort;
 
         public GameServer(int port)
         {
@@ -24,7 +24,13 @@ namespace Assets.Scripts.Util
             _udpClient = new UdpClient();
         }
 
-        private void StartServer()
+        public void StartServer()
+        {
+            var thread = new Thread(new ThreadStart(() => { StartServerThread(); }));
+            thread.Start();
+        }
+
+        private void StartServerThread()
         {
             IPEndPoint groupEP = new IPEndPoint(IPAddress.Any, listenPort);
 
@@ -36,7 +42,7 @@ namespace Assets.Scripts.Util
                     byte[] bytes = _udpClient.Receive(ref groupEP);
                     var json = Encoding.UTF8.GetString(bytes, 0, bytes.Length);
 
-                    var message = JsonConvert.DeserializeObject<MessageModel>(json);
+                    var message = JsonUtility.FromJson<MessageModel>(json);
                     var thread = new Thread(new ThreadStart(() => { HandleMessage(message, groupEP); }));
                     thread.Start();
                 }
@@ -47,7 +53,8 @@ namespace Assets.Scripts.Util
             }
             finally
             {
-                listener.Close();
+                _udpClient.Close();
+                Debug.Log("Server closed");
             }
         }
 
@@ -68,12 +75,22 @@ namespace Assets.Scripts.Util
                 case Enums.Action.PLAY_CARD:
                     PlayCard(action, groupEP);
                     break;
+                case Enums.Action.START_GAME:
+                    StartGame(action, groupEP);
+                    break;
             }
+            UpdateGameState();
+        }
+
+        private void StartGame(ActionObject action, IPEndPoint groupEP)
+        {
+            MatchController.StartGame();
         }
 
         public void AddPlayer(ActionObject action, IPEndPoint groupEP)
         {
             MatchController.AddPlayer(action.Player);
+            playersIps.Add(action.Player, groupEP);
             var response = new ResponseMessage
             {
                 Id = Guid.NewGuid(),
@@ -81,7 +98,7 @@ namespace Assets.Scripts.Util
                 GuessingRound = true,
                 AdjustPlayer = false,
             };
-            var json = JsonConvert.SerializeObject(response);
+            var json = JsonUtility.ToJson(response);
             byte[] bytes = Encoding.UTF8.GetBytes(json);
             _udpClient.Send(bytes, bytes.Length, groupEP);
         }
@@ -89,7 +106,7 @@ namespace Assets.Scripts.Util
         public void Guess(ActionObject action, IPEndPoint groupEP)
         {
             var response = MatchController.Guess(action.Player, action.Guess);
-            var json = JsonConvert.SerializeObject(response);
+            var json = JsonUtility.ToJson(response);
             byte[] bytes = Encoding.UTF8.GetBytes(json);
             _udpClient.Send(bytes, bytes.Length, groupEP);
         }
@@ -97,19 +114,57 @@ namespace Assets.Scripts.Util
         public void Pass(ActionObject action, IPEndPoint groupEP)
         {
             var response = MatchController.Pass(action.Player);
-            var json = JsonConvert.SerializeObject(response);
+            var json = JsonUtility.ToJson(response);
             byte[] bytes = Encoding.UTF8.GetBytes(json);
             _udpClient.Send(bytes, bytes.Length, groupEP);
         }
 
         public void PlayCard(ActionObject action, IPEndPoint groupEP)
         {
-            var response = MatchController.PlayCard(action.Player, action.Card);
-            var json = JsonConvert.SerializeObject(response);
+            MatchController.PlayCard(action.Player, action.Card);
+        }
+
+        public void UpdateGameState()
+        {
+            
+            playersIps.Keys.ToList().ForEach(p =>
+            {
+                var message = new ResponseMessage
+                {
+                    Id = Guid.NewGuid(),
+                    Guesses = MatchController.Guesses,
+                    GuessingRound = MatchController.IsGuessing,
+                    Wins = MatchController.Wins,
+                    Table = MatchController.Table,
+                    CanPlay = p == MatchController.CurrentPlayer,
+                    AdjustPlayer = true,
+                    Player = MatchController.Players.Where(x => x.Id == p.Id).FirstOrDefault()
+                };
+                var bytes = GetMessageBytes(message);
+                _udpClient.Send(bytes, bytes.Length, playersIps[p]);
+            });
+        }
+
+        public void SendPlayerUpdate(Player player)
+        {
+            var message = new ResponseMessage
+            {
+                Id = Guid.NewGuid(),
+                AdjustPlayer = true,
+                Player = player
+            };
+            var bytes = GetMessageBytes(message);
+            _udpClient.Send(bytes, bytes.Length, playersIps[player]);
+        }
+
+        private static byte[] GetMessageBytes(ResponseMessage response)
+        {
+            var json = JsonUtility.ToJson(response);
             byte[] bytes = Encoding.UTF8.GetBytes(json);
-            _udpClient.Send(bytes, bytes.Length, groupEP);
+            return bytes;
         }
 
         public MatchController MatchController { get; set; }
+        public Dictionary<Player, IPEndPoint> playersIps;
     }
 }

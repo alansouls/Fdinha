@@ -1,10 +1,12 @@
 ﻿using Assets.Scripts.Entites;
 using Assets.Scripts.Enums;
 using Assets.Scripts.Local;
+using Assets.Scripts.Util;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.UI;
@@ -22,10 +24,14 @@ public class MatchController : MonoBehaviour
     public IDictionary<Player, int> Guesses;
     public IDictionary<Player, int> Wins;
     public Text PlayerCountText;
+    public GameServer GameServer;
 
     // Start is called before the first frame update
     void Start()
     {
+        GameServer = new GameServer(8965);
+        GameServer.MatchController = this;
+        GameServer.StartServer();
         Table = new Stack<Card>();
         Cards = new Stack<Card>();
         Players = new List<Player>();
@@ -34,7 +40,7 @@ public class MatchController : MonoBehaviour
         MaxRound = 3;
         IsGuessing = false;
         GenerateCards();
-        GetAllPlayers();
+        //GetAllPlayers();
     }
 
     // Update is called once per frame
@@ -49,22 +55,28 @@ public class MatchController : MonoBehaviour
         PlayerCountText.text = $"Player Count: {Players.Count}";
     }
 
-    public ResponseMessage PlayCard(Player player, Card card)
+    public void PlayCard(Player player, Card card)
     {
+        var newPlayer = Players.Where(p => p.Id == player.Id).FirstOrDefault();
+        newPlayer.Cards = player.Cards;
+        
         if (player == LastPlayer)
         {
             PlaceCardInTable(player, card);
             AddWinToWinningPlayer();
             CurrentPlayer = NextPlayer(player);
+            GameServer.SendPlayerUpdate(CurrentPlayer);
         }
         else
         {
             PlaceCardInTable(player, card);
             CurrentPlayer = NextPlayer(player);
+            GameServer.SendPlayerUpdate(CurrentPlayer);
         }
         if (!Players.Where(p => p.Cards.Count > 0).Any())
         {
             RemoveLives();
+            GameServer.SendPlayerUpdate(CurrentPlayer);
             StartRound();
         }
         if (Players.Where(p => p.Lives > 0).Count() <= 1)
@@ -274,6 +286,5 @@ public class MatchController : MonoBehaviour
             var playerBehaviour = playerGO.GetComponent<PlayerBehavior>();
             Players.Add(playerBehaviour.Player);
         }
-        PlayerCountText.text = $"Player Count: {Players.Count}";
     }
 }

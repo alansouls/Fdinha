@@ -9,7 +9,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6933643818202470380}
-  - component: {fileID: 6933643818202470381}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -32,27 +31,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &6933643818202470381
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6933643818202470387}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 76fdd373f096fb543a883a8c323a9623, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Card1: {fileID: 6933643819723621652}
-  Card2: {fileID: 6933643818698571859}
-  Card3: {fileID: 6933643818851685774}
-  MatchController: {fileID: 0}
-  GuessButtons:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
 --- !u!1 &6933643818630517978
 GameObject:
   m_ObjectHideFlags: 0
@@ -207,6 +185,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5334209bd51db094687f78572699dc22, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Card:
+    Valid: 0
+    Value: 0
+    Suit: 0
   PlayCardButton: {fileID: 0}
   CancellCardButton: {fileID: 0}
   CanPlay: 0
@@ -331,6 +313,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5334209bd51db094687f78572699dc22, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Card:
+    Valid: 0
+    Value: 0
+    Suit: 0
   PlayCardButton: {fileID: 0}
   CancellCardButton: {fileID: 0}
   CanPlay: 0
@@ -455,6 +441,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5334209bd51db094687f78572699dc22, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Card:
+    Valid: 0
+    Value: 0
+    Suit: 0
   PlayCardButton: {fileID: 0}
   CancellCardButton: {fileID: 0}
   CanPlay: 0
