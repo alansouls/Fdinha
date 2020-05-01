@@ -1,5 +1,6 @@
 ﻿using Assets.Scripts.Entites;
 using Assets.Scripts.Enums;
+using Assets.Scripts.Local;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -42,17 +43,13 @@ public class MatchController : MonoBehaviour
         
     }
 
-    public void AddPlayer()
+    public void AddPlayer(Player player)
     {
-        Players.Add(new Player
-        {
-            Cards = new List<Card>(),
-            Lives = 3
-        });
+        Players.Add(player);
         PlayerCountText.text = $"Player Count: {Players.Count}";
     }
 
-    public void PlayCard(Player player, Card card)
+    public ResponseMessage PlayCard(Player player, Card card)
     {
         if (player == LastPlayer)
         {
@@ -74,9 +71,17 @@ public class MatchController : MonoBehaviour
             EndGame();
     }
 
-    public void Pass(Player player)
+    public ResponseMessage Pass(Player player)
     {
         CurrentPlayer = NextPlayer(player);
+        return new ResponseMessage
+        {
+            Id = Guid.NewGuid(),
+            AdjustPlayer = true,
+            CanPlay = true,
+            GuessingRound = IsGuessing,
+            Player = CurrentPlayer
+        };
     }
 
     private void EndGame()
@@ -173,12 +178,17 @@ public class MatchController : MonoBehaviour
         }
     }
 
-    public bool Guess(Player player, int guess)
+    public ResponseMessage Guess(Player player, int guess)
     {
         if (player == LastPlayer)
         {
             if (guess == MaxRound)
-                return false;
+                return new ResponseMessage
+                {
+                    Id = Guid.NewGuid(),
+                    CanPlay = true,
+                    GuessingRound = true,
+                };
             else
             {
                 IsGuessing = false;
@@ -186,7 +196,12 @@ public class MatchController : MonoBehaviour
         }
         Guesses[player] = guess;
         CurrentPlayer = NextPlayer(player);
-        return true;
+        return new ResponseMessage
+        {
+            Id = Guid.NewGuid(),
+            CanPlay = false,
+            GuessingRound = IsGuessing,
+        };
     }
 
     private Player NextPlayer(Player player)

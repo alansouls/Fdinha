@@ -12,6 +12,7 @@
     {
         PASS,
         GUESS,
-        PLAY_CARD
+        PLAY_CARD,
+        ADD_PLAYER
     }
 }

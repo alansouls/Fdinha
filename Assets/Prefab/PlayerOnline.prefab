@@ -119,8 +119,8 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 1059505843750703153}
-        m_MethodName: MakeGuess
-        m_Mode: 3
+        m_MethodName: SpecialButton
+        m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -289,21 +289,6 @@ MonoBehaviour:
     m_VerticalOverflow: 0
     m_LineSpacing: 1
   m_Text: New Text
---- !u!114 &7190885242567273120
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3437535118267060520}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5334209bd51db094687f78572699dc22, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  PlayCardButton: {fileID: 5340154191356278200}
-  CancellCardButton: {fileID: 5340154192053430687}
-  CanPlay: 0
 --- !u!114 &1059505843750703153
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -367,6 +352,21 @@ MonoBehaviour:
     i15: 0
   m_ServerOnly: 0
   m_LocalPlayerAuthority: 0
+--- !u!114 &7190885242567273120
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3437535118267060520}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5334209bd51db094687f78572699dc22, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  PlayCardButton: {fileID: 5340154191356278200}
+  CancellCardButton: {fileID: 5340154192053430687}
+  CanPlay: 0
 --- !u!114 &6791173806282453319
 MonoBehaviour:
   m_ObjectHideFlags: 0

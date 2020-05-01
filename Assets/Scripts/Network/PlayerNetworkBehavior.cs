@@ -23,7 +23,7 @@ public class PlayerNetworkBehavior : NetworkBehaviour
     public bool CanPlay;
     [SyncVar]
     public bool GuessingRound;
-    [SyncVar]
+    [SyncVar(hook ="VarChanged")]
     public int TestSyncVar;
     public Text TestSyncVarText;
     public GameObject ActionPrefab;
@@ -66,13 +66,12 @@ public class PlayerNetworkBehavior : NetworkBehaviour
         var card1 = Player.Cards.ElementAtOrDefault(0);
         var card2 = Player.Cards.ElementAtOrDefault(1);
         var card3 = Player.Cards.ElementAtOrDefault(2);
-        if (isLocalPlayer)
-        {
-            HandleCardBehaviourActiveness(card1, card2, card3);
-            BindCardsToBehaviour(card1, card2, card3);
-            VerifyGuessButtonsActiveness();
-            VerifyIfCanPlay();
-        }
+        HandleCardBehaviourActiveness(card1, card2, card3);
+        BindCardsToBehaviour(card1, card2, card3);
+        VerifyGuessButtonsActiveness();
+        VerifyIfCanPlay();
+        var clients = NetworkClient.allClients;
+        var server = NetworkServer.connections;
     }
 
     private void VerifyIfCanPlay()
@@ -113,6 +112,23 @@ public class PlayerNetworkBehavior : NetworkBehaviour
     public void MakeGuess(int guess)
     {
         CmdMakeGuess(guess);
+    }
+
+    public void VarChanged(int value)
+    {
+        TestSyncVar = value;
+        Debug.Log("Received changed");
+    }
+
+    public void SpecialButton()
+    {
+        if (!isServer)
+            return;
+        var players = GameObject.FindGameObjectsWithTag("Player").Select(p => p.GetComponent<PlayerNetworkBehavior>()).ToList();
+        foreach (var player in players)
+        {
+            player.TestSyncVar = 50;
+        }
     }
 
     public void PlayCard1()
