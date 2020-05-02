@@ -25,6 +25,7 @@ public class MatchController : MonoBehaviour
     public IDictionary<Player, int> Wins;
     public Text PlayerCountText;
     public GameServer GameServer;
+    public Thread ServerThread;
 
     // Start is called before the first frame update
     void Start()
@@ -47,6 +48,11 @@ public class MatchController : MonoBehaviour
     void Update()
     {
         
+    }
+
+    private void OnDisable()
+    {
+        ServerThread.Abort();
     }
 
     public void AddPlayer(Player player)
@@ -88,7 +94,7 @@ public class MatchController : MonoBehaviour
         CurrentPlayer = NextPlayer(player);
         return new ResponseMessage
         {
-            Id = Guid.NewGuid(),
+            Id = Guid.NewGuid().ToString(),
             AdjustPlayer = true,
             CanPlay = true,
             GuessingRound = IsGuessing,
@@ -197,7 +203,7 @@ public class MatchController : MonoBehaviour
             if (guess == MaxRound)
                 return new ResponseMessage
                 {
-                    Id = Guid.NewGuid(),
+                    Id = Guid.NewGuid().ToString(),
                     CanPlay = true,
                     GuessingRound = true,
                 };
@@ -210,7 +216,7 @@ public class MatchController : MonoBehaviour
         CurrentPlayer = NextPlayer(player);
         return new ResponseMessage
         {
-            Id = Guid.NewGuid(),
+            Id = Guid.NewGuid().ToString(),
             CanPlay = false,
             GuessingRound = IsGuessing,
         };

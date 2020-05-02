@@ -10,8 +10,8 @@ namespace Assets.Scripts.Messages
     [Serializable]
     public class MessageModel
     {
-        public Guid MessageId { get; set; }
+        public string MessageId;
 
-        public ActionObject Action { get; set; }
+        public ActionObject Action;
     }
 }

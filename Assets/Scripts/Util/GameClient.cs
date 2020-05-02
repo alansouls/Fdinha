@@ -22,16 +22,16 @@ namespace Assets.Scripts.Util
         public PlayerBehavior Player { get; set; }
         public IPEndPoint ServerEP;
 
-        public GameClient(int port)
+        public GameClient(int port, int serverPort)
         {
-            serverPort = port;
-            _udpClient = new UdpClient();
+            this.serverPort = serverPort;
+            _udpClient = new UdpClient(port);
         }
 
         public void ListenServerUpdates()
         {
-            var thread = new Thread(new ThreadStart(() => { ListenServerUpdatesThread(); }));
-            thread.Start();
+            Player.GameClientThread  = new Thread(new ThreadStart(() => { ListenServerUpdatesThread(); }));
+            Player.GameClientThread.Start();
         }
 
         private void ListenServerUpdatesThread()
@@ -46,8 +46,7 @@ namespace Assets.Scripts.Util
                     var json = Encoding.UTF8.GetString(bytes, 0, bytes.Length);
 
                     var message = JsonUtility.FromJson<ResponseMessage>(json);
-                    var thread = new Thread(new ThreadStart(() => { HandleMessage(message, ServerEP); }));
-                    thread.Start();
+                    HandleMessage(message, ServerEP);
                 }
             }
             catch (SocketException e)

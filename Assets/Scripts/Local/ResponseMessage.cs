@@ -8,22 +8,23 @@ using System.Threading.Tasks;
 
 namespace Assets.Scripts.Local
 {
+    [Serializable]
     public class ResponseMessage
     {
-        public Guid Id { get; set; }
+        public string Id;
 
-        public Player Player { get; set; }
+        public Player Player;
 
-        public bool AdjustPlayer { get; set; }
+        public bool AdjustPlayer;
 
-        public bool CanPlay { get; set; }
+        public bool CanPlay;
 
-        public bool GuessingRound { get; set; }
+        public bool GuessingRound;
 
-        public Stack<Card> Table { get; set; }
+        public Stack<Card> Table;
 
-        public IDictionary<Player, int> Guesses { get; set; }
+        public IDictionary<Player, int> Guesses;
 
-        public IDictionary<Player, int> Wins { get; set; }
+        public IDictionary<Player, int> Wins;
     }
 }

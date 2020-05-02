@@ -11,7 +11,7 @@ public struct Player
     public int Lives;
     public string Name;
     public List<Card> Cards;
-    public Guid Id;
+    public string Id;
 
     public override bool Equals(object obj)
     {

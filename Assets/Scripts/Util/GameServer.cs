@@ -7,8 +7,6 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
-using UnityEditor.VersionControl;
 using UnityEngine;
 
 namespace Assets.Scripts.Util
@@ -21,30 +19,28 @@ namespace Assets.Scripts.Util
         public GameServer(int port)
         {
             listenPort = port;
-            _udpClient = new UdpClient();
+            _udpClient = new UdpClient(port);
         }
 
         public void StartServer()
         {
-            var thread = new Thread(new ThreadStart(() => { StartServerThread(); }));
-            thread.Start();
+            MatchController.ServerThread = new Thread(new ThreadStart(() => { StartServerThread(); }));
+            MatchController.ServerThread.Start();
         }
 
         private void StartServerThread()
         {
-            IPEndPoint groupEP = new IPEndPoint(IPAddress.Any, listenPort);
+            IPEndPoint groupEP = new IPEndPoint(IPAddress.Any, 0);
 
             try
             {
                 while (true)
                 {
-                    Console.WriteLine("Waiting for broadcast");
                     byte[] bytes = _udpClient.Receive(ref groupEP);
                     var json = Encoding.UTF8.GetString(bytes, 0, bytes.Length);
 
                     var message = JsonUtility.FromJson<MessageModel>(json);
-                    var thread = new Thread(new ThreadStart(() => { HandleMessage(message, groupEP); }));
-                    thread.Start();
+                    HandleMessage(message, groupEP);
                 }
             }
             catch (SocketException e)
@@ -93,7 +89,7 @@ namespace Assets.Scripts.Util
             playersIps.Add(action.Player, groupEP);
             var response = new ResponseMessage
             {
-                Id = Guid.NewGuid(),
+                Id = Guid.NewGuid().ToString(),
                 CanPlay = false,
                 GuessingRound = true,
                 AdjustPlayer = false,
@@ -131,7 +127,7 @@ namespace Assets.Scripts.Util
             {
                 var message = new ResponseMessage
                 {
-                    Id = Guid.NewGuid(),
+                    Id = Guid.NewGuid().ToString(),
                     Guesses = MatchController.Guesses,
                     GuessingRound = MatchController.IsGuessing,
                     Wins = MatchController.Wins,
@@ -149,7 +145,7 @@ namespace Assets.Scripts.Util
         {
             var message = new ResponseMessage
             {
-                Id = Guid.NewGuid(),
+                Id = Guid.NewGuid().ToString(),
                 AdjustPlayer = true,
                 Player = player
             };

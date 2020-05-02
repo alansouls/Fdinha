@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Text.RegularExpressions;
+using System.Threading;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -24,6 +25,7 @@ public class PlayerBehavior : MonoBehaviour
     public bool GuessingRound;
     public GameClient GameClient;
     public bool Host;
+    public Thread GameClientThread;
 
     // Start is called before the first frame update
     void Start()
@@ -31,10 +33,11 @@ public class PlayerBehavior : MonoBehaviour
         Host = false;
         CanPlay = false;
         GuessingRound = true;
-        GameClient = new GameClient(7777);
+        GameClient = new GameClient(7777, 8965);
+        GameClient.Player = this;
         Player = new Player
         {
-            Id = Guid.NewGuid(),
+            Id = Guid.NewGuid().ToString(),
             Cards = new List<Card>(),
             Lives = 3
         };
@@ -57,6 +60,11 @@ public class PlayerBehavior : MonoBehaviour
         CheckIfCanPlay();
     }
 
+    private void OnDisable()
+    {
+        GameClientThread.Abort();
+    }
+
     public void JoinGame(string serverIp)
     {
         var ip = IPAddress.Parse(serverIp);
@@ -70,7 +78,7 @@ public class PlayerBehavior : MonoBehaviour
         GameClient.ListenServerUpdates();
         GameClient.SendCommandToServer(new MessageModel
         {
-            MessageId = Guid.NewGuid(),
+            MessageId = Guid.NewGuid().ToString(),
             Action = new ActionObject
             {
                 Action = Assets.Scripts.Enums.Action.ADD_PLAYER,
@@ -91,7 +99,7 @@ public class PlayerBehavior : MonoBehaviour
             CanPlay = false;
             GameClient.SendCommandToServer(new MessageModel
             {
-                MessageId = Guid.NewGuid(),
+                MessageId = Guid.NewGuid().ToString(),
                 Action = new ActionObject
                 {
                     Action = Assets.Scripts.Enums.Action.PASS,
@@ -129,7 +137,7 @@ public class PlayerBehavior : MonoBehaviour
         CanPlay = false;
         GameClient.SendCommandToServer(new MessageModel
         {
-            MessageId = Guid.NewGuid(),
+            MessageId = Guid.NewGuid().ToString(),
             Action = new ActionObject
             {
                 Action = Assets.Scripts.Enums.Action.GUESS,
@@ -179,7 +187,7 @@ public class PlayerBehavior : MonoBehaviour
         CanPlay = false;
         GameClient.SendCommandToServer(new MessageModel
         {
-            MessageId = Guid.NewGuid(),
+            MessageId = Guid.NewGuid().ToString(),
             Action = new ActionObject
             {
                 Action = Assets.Scripts.Enums.Action.PLAY_CARD,
