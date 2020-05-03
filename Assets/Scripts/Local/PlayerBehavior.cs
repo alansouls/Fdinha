@@ -25,26 +25,43 @@ public class PlayerBehavior : MonoBehaviour
     public bool GuessingRound;
     public GameClient GameClient;
     public bool Host;
-    public Thread GameClientThread;
+    public Button StartGameButton;
+    public Text PlayerCountText;
+    public bool IsReady;
+    public Button ReadyButton;
+    public Text HostIp;
+    public CardBehaviour[] TopCardsTable;
 
     // Start is called before the first frame update
     void Start()
     {
-        Host = false;
+        Table = new Stack<Card>();
+        StartGameButton.gameObject.SetActive(false);
+        PlayerCountText.gameObject.SetActive(false);
         CanPlay = false;
         GuessingRound = true;
-        GameClient = new GameClient(7777, 8965);
+        if (Host)
+        {
+            GameClient = new GameClient(7777, 8965);
+        }
+        else
+        {
+            GameClient = new GameClient(7778, 8965);
+        }
         GameClient.Player = this;
         Player = new Player
         {
             Id = Guid.NewGuid().ToString(),
             Cards = new List<Card>(),
-            Lives = 3
+            Lives = 3,
+            Valid = true
         };
         foreach (var button in GuessButtons)
         {
             button.onClick.AddListener(() => { MakeGuess(GuessButtons.ToList().IndexOf(button)); });
         }
+        StartGameButton.gameObject.SetActive(Host);
+        PlayerCountText.gameObject.SetActive(Host);
     }
 
     // Update is called once per frame
@@ -53,28 +70,55 @@ public class PlayerBehavior : MonoBehaviour
         var card1 = Player.Cards.ElementAtOrDefault(0);
         var card2 = Player.Cards.ElementAtOrDefault(1);
         var card3 = Player.Cards.ElementAtOrDefault(2);
+        var tableCard1 = Table.Any() ? Table.Pop() : new Card();
+        var tableCard2 = Table.Any() ? Table.Pop() : new Card();
+        var tableCard3 = Table.Any() ? Table.Pop() : new Card();
+        Table.Push(tableCard3);
+        Table.Push(tableCard2);
+        Table.Push(tableCard1);
+        BindTableCards(tableCard1, tableCard2, tableCard3);
+        HandleTableCardBehaviourActiveness(tableCard1, tableCard2, tableCard3);
         HandleCardBehaviourActiveness(card1, card2, card3);
         BindCardsToBehaviour(card1, card2, card3);
         VerifyGuessButtonsActiveness();
         VerifyIfCanPlay();
         CheckIfCanPlay();
+        ReadyButton.gameObject.SetActive(!IsReady);
     }
 
-    private void OnDisable()
+    private void BindTableCards(Card tableCard1, Card tableCard2, Card tableCard3)
     {
-        GameClientThread.Abort();
+        if (tableCard1 != TopCardsTable[0].Card)
+            TopCardsTable[0].Card = tableCard1;
+        if (tableCard2 != TopCardsTable[1].Card)
+            TopCardsTable[1].Card = tableCard2;
+        if (tableCard3 != TopCardsTable[2].Card)
+            TopCardsTable[2].Card = tableCard3;
     }
 
-    public void JoinGame(string serverIp)
+    public void CreateGame()
     {
-        var ip = IPAddress.Parse(serverIp);
-        Host = true;
+        var ip = IPAddress.Parse("127.0.0.1");
+        StartGameButton.gameObject.SetActive(true);
+        PlayerCountText.gameObject.SetActive(true);
         JoinGame(ip);
+    }
+
+    public void JoinGame()
+    {
+        bool valid = IPAddress.TryParse(HostIp.text, out IPAddress ip);
+
+        if (valid)
+            JoinGame(ip);
+        else
+        {
+            Debug.Log("Invalid ip");
+        }
     }
 
     public void JoinGame(IPAddress serverIp)
     {
-        GameClient.ServerIp = serverIp;
+        GameClient.DefineServerEP(serverIp);
         GameClient.ListenServerUpdates();
         GameClient.SendCommandToServer(new MessageModel
         {
@@ -85,6 +129,7 @@ public class PlayerBehavior : MonoBehaviour
                 Player = Player
             }
         });
+        IsReady = true;
     }
 
     public void DefineHost()
@@ -207,6 +252,34 @@ public class PlayerBehavior : MonoBehaviour
             Card3.Card = card3;
     }
 
+    private void HandleTableCardBehaviourActiveness(Card card1, Card card2, Card card3)
+    {
+        if (card1 == null && TopCardsTable[0].gameObject.activeSelf == true)
+        {
+            TopCardsTable[0].gameObject.SetActive(false);
+        }
+        else if (card1 != null && TopCardsTable[0].gameObject.activeSelf == false)
+        {
+            TopCardsTable[0].gameObject.SetActive(true);
+        }
+        if (card2 == null && TopCardsTable[1].gameObject.activeSelf == true)
+        {
+            TopCardsTable[1].gameObject.SetActive(false);
+        }
+        else if (card2 != null && TopCardsTable[1].gameObject.activeSelf == false)
+        {
+            TopCardsTable[1].gameObject.SetActive(true);
+        }
+        if (card3 == null && TopCardsTable[2].gameObject.activeSelf == true)
+        {
+            TopCardsTable[2].gameObject.SetActive(false);
+        }
+        else if (card3 != null && TopCardsTable[2].gameObject.activeSelf == false)
+        {
+            TopCardsTable[2].gameObject.SetActive(true);
+        }
+    }
+
     private void HandleCardBehaviourActiveness(Card card1, Card card2, Card card3)
     {
         if (card1 == null && Card1.gameObject.activeSelf == true)
@@ -233,5 +306,17 @@ public class PlayerBehavior : MonoBehaviour
         {
             Card3.gameObject.SetActive(true);
         }
+    }
+
+    public void StartGame()
+    {
+        GameClient.SendCommandToServer(new MessageModel
+        {
+            MessageId = Guid.NewGuid().ToString(),
+            Action = new ActionObject
+            {
+                Action = Assets.Scripts.Enums.Action.START_GAME,
+            }
+        });
     }
 }

@@ -192,6 +192,8 @@ MonoBehaviour:
   PlayCardButton: {fileID: 0}
   CancellCardButton: {fileID: 0}
   CanPlay: 0
+  Renderer: {fileID: 0}
+  SpriteName: 
 --- !u!1 &6933643818851685778
 GameObject:
   m_ObjectHideFlags: 0
@@ -320,6 +322,8 @@ MonoBehaviour:
   PlayCardButton: {fileID: 0}
   CancellCardButton: {fileID: 0}
   CanPlay: 0
+  Renderer: {fileID: 0}
+  SpriteName: 
 --- !u!1 &6933643819723621656
 GameObject:
   m_ObjectHideFlags: 0
@@ -448,3 +452,5 @@ MonoBehaviour:
   PlayCardButton: {fileID: 0}
   CancellCardButton: {fileID: 0}
   CanPlay: 0
+  Renderer: {fileID: 0}
+  SpriteName: 

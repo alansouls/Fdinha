@@ -25,7 +25,7 @@ public class MatchController : MonoBehaviour
     public IDictionary<Player, int> Wins;
     public Text PlayerCountText;
     public GameServer GameServer;
-    public Thread ServerThread;
+    public List<Card> CardsGone;
 
     // Start is called before the first frame update
     void Start()
@@ -50,56 +50,54 @@ public class MatchController : MonoBehaviour
         
     }
 
-    private void OnDisable()
-    {
-        ServerThread.Abort();
-    }
-
     public void AddPlayer(Player player)
     {
         Players.Add(player);
-        PlayerCountText.text = $"Player Count: {Players.Count}";
     }
 
     public void PlayCard(Player player, Card card)
     {
         var newPlayer = Players.Where(p => p.Id == player.Id).FirstOrDefault();
         newPlayer.Cards = player.Cards;
+        Players.Remove(newPlayer);
+        Players.Add(newPlayer);
         
         if (player == LastPlayer)
         {
             PlaceCardInTable(player, card);
             AddWinToWinningPlayer();
             CurrentPlayer = NextPlayer(player);
-            GameServer.SendPlayerUpdate(CurrentPlayer);
+            GameServer.UpdateGameState();
+            Thread.Sleep(500);
+            CardsGone = Table.ToList();
+            Table.Clear();
         }
         else
         {
             PlaceCardInTable(player, card);
             CurrentPlayer = NextPlayer(player);
-            GameServer.SendPlayerUpdate(CurrentPlayer);
+            GameServer.UpdateGameState();
+            Thread.Sleep(500);
         }
         if (!Players.Where(p => p.Cards.Count > 0).Any())
         {
             RemoveLives();
-            GameServer.SendPlayerUpdate(CurrentPlayer);
             StartRound();
+            GameServer.UpdateGameState();
+            Thread.Sleep(500);
         }
         if (Players.Where(p => p.Lives > 0).Count() <= 1)
+        {
             EndGame();
+            GameServer.UpdateGameState();
+            Thread.Sleep(500);
+        }
     }
 
-    public ResponseMessage Pass(Player player)
+    public void Pass(Player player)
     {
         CurrentPlayer = NextPlayer(player);
-        return new ResponseMessage
-        {
-            Id = Guid.NewGuid().ToString(),
-            AdjustPlayer = true,
-            CanPlay = true,
-            GuessingRound = IsGuessing,
-            Player = CurrentPlayer
-        };
+        GameServer.UpdateGameState();
     }
 
     private void EndGame()
@@ -151,14 +149,19 @@ public class MatchController : MonoBehaviour
 
     private void RemoveLives()
     {
-        foreach (var player in Players)
+        foreach (var player in Players.ToList())
         {
+            var newPlayer = player;
             int wins = 0;
             int guess = Guesses[player];
             if (Wins.ContainsKey(player))
                 wins = Wins[player];
-            if (wins != guess) ;
-                //RemoveLives()
+            if (wins != guess)
+            {
+                newPlayer.Lives -= 1;
+                Players.Remove(newPlayer);
+                Players.Add(newPlayer);
+            }
         }
     }
 
@@ -166,6 +169,11 @@ public class MatchController : MonoBehaviour
     {
         while (Table.Count > 0)
             Cards.Push(Table.Pop());
+        foreach(var card in CardsGone)
+        {
+            Cards.Push(card);
+        }
+        CardsGone.Clear();
         ShuffleDeck();
     }
 
@@ -176,6 +184,7 @@ public class MatchController : MonoBehaviour
         var position = rnd.Next(0, Players.Count - 1);
         CurrentPlayer = Players[position];
         LastPlayer = Players.ElementAtOrDefault(position - 1).Valid ? Players.ElementAtOrDefault(position - 1) : Players.Last();
+        GameServer.UpdateGameState();
     }
 
     public void StartRound()
@@ -196,17 +205,13 @@ public class MatchController : MonoBehaviour
         }
     }
 
-    public ResponseMessage Guess(Player player, int guess)
+    public void Guess(Player player, int guess)
     {
         if (player == LastPlayer)
         {
-            if (guess == MaxRound)
-                return new ResponseMessage
-                {
-                    Id = Guid.NewGuid().ToString(),
-                    CanPlay = true,
-                    GuessingRound = true,
-                };
+            var sumGuesses = Guesses.Select(g => g.Value).Sum();
+            if (sumGuesses + guess == MaxRound)
+                return;
             else
             {
                 IsGuessing = false;
@@ -214,12 +219,7 @@ public class MatchController : MonoBehaviour
         }
         Guesses[player] = guess;
         CurrentPlayer = NextPlayer(player);
-        return new ResponseMessage
-        {
-            Id = Guid.NewGuid().ToString(),
-            CanPlay = false,
-            GuessingRound = IsGuessing,
-        };
+        GameServer.UpdateGameState();
     }
 
     private Player NextPlayer(Player player)
@@ -259,6 +259,7 @@ public class MatchController : MonoBehaviour
                 {
                     Value = i,
                     Suit = j,
+                    Valid = true
                 });
             }
         }

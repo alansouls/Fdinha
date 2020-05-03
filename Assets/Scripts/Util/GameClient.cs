@@ -1,4 +1,6 @@
-﻿using Assets.Scripts.Local;
+﻿using Assets.Scripts.Entities;
+using Assets.Scripts.Extensions;
+using Assets.Scripts.Local;
 using Assets.Scripts.Messages;
 using System;
 using System.Collections.Generic;
@@ -17,8 +19,6 @@ namespace Assets.Scripts.Util
     {
         private readonly UdpClient _udpClient;
         private readonly int serverPort;
-        
-        public IPAddress ServerIp { get; set; }
         public PlayerBehavior Player { get; set; }
         public IPEndPoint ServerEP;
 
@@ -28,43 +28,38 @@ namespace Assets.Scripts.Util
             _udpClient = new UdpClient(port);
         }
 
-        public void ListenServerUpdates()
+        public void DefineServerEP(IPAddress serverIp)
         {
-            Player.GameClientThread  = new Thread(new ThreadStart(() => { ListenServerUpdatesThread(); }));
-            Player.GameClientThread.Start();
+            ServerEP = new IPEndPoint(serverIp, serverPort);
         }
 
-        private void ListenServerUpdatesThread()
+        public void ListenServerUpdates()
         {
-            ServerEP = new IPEndPoint(ServerIp, serverPort);
             try
             {
-                while (true)
-                {
-                    Console.WriteLine("Waiting for broadcast");
-                    byte[] bytes = _udpClient.Receive(ref ServerEP);
-                    var json = Encoding.UTF8.GetString(bytes, 0, bytes.Length);
-
-                    var message = JsonUtility.FromJson<ResponseMessage>(json);
-                    HandleMessage(message, ServerEP);
-                }
+                _udpClient.BeginReceive(new AsyncCallback((a) => ServerMessageReceived(a)), null);
             }
             catch (SocketException e)
             {
                 Console.WriteLine(e);
             }
-            finally
-            {
-                _udpClient.Close();
-                Debug.Log("Server closed");
-            }
         }
 
-        private void HandleMessage(ResponseMessage message, IPEndPoint groupEP)
+        public void ServerMessageReceived(IAsyncResult a)
         {
-            Player.Guesses = message.Guesses;
-            Player.Wins = message.Wins;
-            Player.Table = message.Table;
+            var bytes = _udpClient.EndReceive(a, ref ServerEP);
+            var json = Encoding.UTF8.GetString(bytes, 0, bytes.Length);
+
+            var message = JsonUtility.FromJson<ResponseMessage>(json);
+            HandleMessage(message);
+            ListenServerUpdates();
+        }
+
+        private void HandleMessage(ResponseMessage message)
+        {
+            Player.Guesses = GameState.GuessesDictionary(message.GameStates);
+            Player.Wins = GameState.WinsDictionary(message.GameStates);
+            Player.Table = message.Table.ToStack();
             Player.CanPlay = message.CanPlay;
             Player.GuessingRound = message.GuessingRound;
             if (message.AdjustPlayer)

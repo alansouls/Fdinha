@@ -1,4 +1,5 @@
-﻿using Assets.Scripts.Local;
+﻿using Assets.Scripts.Entities;
+using Assets.Scripts.Local;
 using Assets.Scripts.Messages;
 using System;
 using System.Collections.Generic;
@@ -20,38 +21,30 @@ namespace Assets.Scripts.Util
         {
             listenPort = port;
             _udpClient = new UdpClient(port);
+            PlayersIps = new Dictionary<Player, IPEndPoint>();
         }
 
         public void StartServer()
         {
-            MatchController.ServerThread = new Thread(new ThreadStart(() => { StartServerThread(); }));
-            MatchController.ServerThread.Start();
-        }
-
-        private void StartServerThread()
-        {
-            IPEndPoint groupEP = new IPEndPoint(IPAddress.Any, 0);
-
             try
             {
-                while (true)
-                {
-                    byte[] bytes = _udpClient.Receive(ref groupEP);
-                    var json = Encoding.UTF8.GetString(bytes, 0, bytes.Length);
-
-                    var message = JsonUtility.FromJson<MessageModel>(json);
-                    HandleMessage(message, groupEP);
-                }
+                _udpClient.BeginReceive(new AsyncCallback((a) => MessageReceived(a)), null);
             }
             catch (SocketException e)
             {
-                Console.WriteLine(e);
+                Debug.Log(e.Message);
             }
-            finally
-            {
-                _udpClient.Close();
-                Debug.Log("Server closed");
-            }
+        }
+
+        private void MessageReceived(IAsyncResult a)
+        {
+            IPEndPoint groupEP = new IPEndPoint(IPAddress.Any, 0);
+            var bytes = _udpClient.EndReceive(a, ref groupEP);
+            var json = Encoding.UTF8.GetString(bytes, 0, bytes.Length);
+
+            var message = JsonUtility.FromJson<MessageModel>(json);
+            HandleMessage(message, groupEP);
+            StartServer();
         }
 
         public void HandleMessage(MessageModel message, IPEndPoint groupEP)
@@ -86,7 +79,7 @@ namespace Assets.Scripts.Util
         public void AddPlayer(ActionObject action, IPEndPoint groupEP)
         {
             MatchController.AddPlayer(action.Player);
-            playersIps.Add(action.Player, groupEP);
+            PlayersIps.Add(action.Player, groupEP);
             var response = new ResponseMessage
             {
                 Id = Guid.NewGuid().ToString(),
@@ -101,18 +94,12 @@ namespace Assets.Scripts.Util
 
         public void Guess(ActionObject action, IPEndPoint groupEP)
         {
-            var response = MatchController.Guess(action.Player, action.Guess);
-            var json = JsonUtility.ToJson(response);
-            byte[] bytes = Encoding.UTF8.GetBytes(json);
-            _udpClient.Send(bytes, bytes.Length, groupEP);
+            MatchController.Guess(action.Player, action.Guess);
         }
 
         public void Pass(ActionObject action, IPEndPoint groupEP)
         {
-            var response = MatchController.Pass(action.Player);
-            var json = JsonUtility.ToJson(response);
-            byte[] bytes = Encoding.UTF8.GetBytes(json);
-            _udpClient.Send(bytes, bytes.Length, groupEP);
+            MatchController.Pass(action.Player);
         }
 
         public void PlayCard(ActionObject action, IPEndPoint groupEP)
@@ -122,23 +109,21 @@ namespace Assets.Scripts.Util
 
         public void UpdateGameState()
         {
-            
-            playersIps.Keys.ToList().ForEach(p =>
+            foreach (var p in PlayersIps.Keys)
             {
                 var message = new ResponseMessage
                 {
                     Id = Guid.NewGuid().ToString(),
-                    Guesses = MatchController.Guesses,
+                    GameStates = GameState.MountGameStates(MatchController.Guesses, MatchController.Wins),
                     GuessingRound = MatchController.IsGuessing,
-                    Wins = MatchController.Wins,
-                    Table = MatchController.Table,
+                    Table = MatchController.Table.ToList(),
                     CanPlay = p == MatchController.CurrentPlayer,
                     AdjustPlayer = true,
                     Player = MatchController.Players.Where(x => x.Id == p.Id).FirstOrDefault()
                 };
                 var bytes = GetMessageBytes(message);
-                _udpClient.Send(bytes, bytes.Length, playersIps[p]);
-            });
+                _udpClient.Send(bytes, bytes.Length, PlayersIps[p]);
+            }
         }
 
         public void SendPlayerUpdate(Player player)
@@ -150,7 +135,7 @@ namespace Assets.Scripts.Util
                 Player = player
             };
             var bytes = GetMessageBytes(message);
-            _udpClient.Send(bytes, bytes.Length, playersIps[player]);
+            _udpClient.Send(bytes, bytes.Length, PlayersIps[player]);
         }
 
         private static byte[] GetMessageBytes(ResponseMessage response)
@@ -161,6 +146,6 @@ namespace Assets.Scripts.Util
         }
 
         public MatchController MatchController { get; set; }
-        public Dictionary<Player, IPEndPoint> playersIps;
+        public Dictionary<Player, IPEndPoint> PlayersIps;
     }
 }
