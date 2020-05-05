@@ -21,6 +21,7 @@ namespace Assets.Scripts.Util
         private readonly int serverPort;
         public PlayerBehavior Player { get; set; }
         public IPEndPoint ServerEP;
+        public List<string> MessagesRead { get; set; }
 
         public GameClient(int port, int serverPort)
         {
@@ -51,12 +52,14 @@ namespace Assets.Scripts.Util
             var json = Encoding.UTF8.GetString(bytes, 0, bytes.Length);
 
             var message = JsonUtility.FromJson<ResponseMessage>(json);
-            HandleMessage(message);
+            if (!MessagesRead.Contains(message.Id))
+                HandleMessage(message);
             ListenServerUpdates();
         }
 
         private void HandleMessage(ResponseMessage message)
         {
+            MessagesRead.Add(message.Id);
             Player.Guesses = GameState.GuessesDictionary(message.GameStates);
             Player.Wins = GameState.WinsDictionary(message.GameStates);
             Player.Table = message.Table.ToStack();

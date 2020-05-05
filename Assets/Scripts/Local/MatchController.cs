@@ -66,7 +66,7 @@ public class MatchController : MonoBehaviour
         {
             PlaceCardInTable(player, card);
             AddWinToWinningPlayer();
-            CurrentPlayer = NextPlayer(player);
+            CurrentPlayer = WinningPlayer;
             GameServer.UpdateGameState();
             Thread.Sleep(500);
             CardsGone = Table.ToList();
@@ -190,6 +190,8 @@ public class MatchController : MonoBehaviour
     public void StartRound()
     {
         IsGuessing = true;
+        CurrentPlayer = WinningPlayer;
+        LastPlayer = PreviousPlayer(CurrentPlayer);
         MaxRound = Players.Select(p => p.Lives).Max();
         ResetDeck();
         DistributeCards();
@@ -236,14 +238,13 @@ public class MatchController : MonoBehaviour
     {
         var cardsReceived = new Dictionary<Player, int>();
         Players.ForEach(p => cardsReceived[p] = 0);
-        for (int i = 0; i < MaxRound; i++)
+        foreach (var player in Players)
         {
-            foreach (var player in Players)
+            int cardsGiven = 0;
+            while (cardsGiven < player.Lives)
             {
-                if (cardsReceived[player] < player.Lives)
-                {
-                    player.Cards.Add(Cards.Pop());
-                }
+                player.Cards.Add(Cards.Pop());
+                cardsGiven++;
             }
         }
     }

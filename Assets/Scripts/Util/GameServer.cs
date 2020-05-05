@@ -22,6 +22,7 @@ namespace Assets.Scripts.Util
             listenPort = port;
             _udpClient = new UdpClient(port);
             PlayersIps = new Dictionary<Player, IPEndPoint>();
+            MessagesRead = new List<string>();
         }
 
         public void StartServer()
@@ -43,12 +44,14 @@ namespace Assets.Scripts.Util
             var json = Encoding.UTF8.GetString(bytes, 0, bytes.Length);
 
             var message = JsonUtility.FromJson<MessageModel>(json);
-            HandleMessage(message, groupEP);
+            if (!MessagesRead.Contains(message.MessageId))
+                HandleMessage(message, groupEP);
             StartServer();
         }
 
         public void HandleMessage(MessageModel message, IPEndPoint groupEP)
         {
+            MessagesRead.Add(message.MessageId);
             var action = message.Action;
             switch (message.Action.Action)
             {
@@ -68,7 +71,6 @@ namespace Assets.Scripts.Util
                     StartGame(action, groupEP);
                     break;
             }
-            UpdateGameState();
         }
 
         private void StartGame(ActionObject action, IPEndPoint groupEP)
@@ -94,16 +96,22 @@ namespace Assets.Scripts.Util
 
         public void Guess(ActionObject action, IPEndPoint groupEP)
         {
+            if (action.Player != MatchController.CurrentPlayer)
+                return;
             MatchController.Guess(action.Player, action.Guess);
         }
 
         public void Pass(ActionObject action, IPEndPoint groupEP)
         {
+            if (action.Player != MatchController.CurrentPlayer)
+                return;
             MatchController.Pass(action.Player);
         }
 
         public void PlayCard(ActionObject action, IPEndPoint groupEP)
         {
+            if (action.Player != MatchController.CurrentPlayer)
+                return;
             MatchController.PlayCard(action.Player, action.Card);
         }
 
@@ -147,5 +155,6 @@ namespace Assets.Scripts.Util
 
         public MatchController MatchController { get; set; }
         public Dictionary<Player, IPEndPoint> PlayersIps;
+        public List<string> MessagesRead { get; set; }
     }
 }

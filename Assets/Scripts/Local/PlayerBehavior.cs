@@ -67,6 +67,11 @@ public class PlayerBehavior : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (CanPlay == true && Player.Cards.Count == 0)
+        {
+            CanPlay = false;
+            Pass();
+        }
         var card1 = Player.Cards.ElementAtOrDefault(0);
         var card2 = Player.Cards.ElementAtOrDefault(1);
         var card3 = Player.Cards.ElementAtOrDefault(2);
@@ -130,6 +135,19 @@ public class PlayerBehavior : MonoBehaviour
             }
         });
         IsReady = true;
+    }
+
+    public void Pass()
+    {
+        GameClient.SendCommandToServer(new MessageModel
+        {
+            MessageId = Guid.NewGuid().ToString(),
+            Action = new ActionObject
+            {
+                Action = Assets.Scripts.Enums.Action.PASS,
+                Player = Player
+            }
+        });
     }
 
     public void DefineHost()
