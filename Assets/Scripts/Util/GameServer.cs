@@ -153,6 +153,11 @@ namespace Assets.Scripts.Util
             return bytes;
         }
 
+        public void Close()
+        {
+            _udpClient.Close();
+        }
+
         public MatchController MatchController { get; set; }
         public Dictionary<Player, IPEndPoint> PlayersIps;
         public List<string> MessagesRead { get; set; }

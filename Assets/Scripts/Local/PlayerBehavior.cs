@@ -9,6 +9,7 @@ using System.Net;
 using System.Text.RegularExpressions;
 using System.Threading;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class PlayerBehavior : MonoBehaviour
@@ -94,10 +95,20 @@ public class PlayerBehavior : MonoBehaviour
         HandleCanPlaySprite();
         AdjustPlayersInfo();
     }
+
+    public void OnDestroy()
+    {
+        GameClient.Close();
+    }
+
+    public void BackToMenu()
+    {
+        SceneManager.LoadScene("Menu");
+    }
     
     public void AdjustPlayersInfo()
     {
-        var players = Guesses.Keys.ToList();
+        var players = Wins.Keys.ToList();
         int i = 0;
         foreach (var player in players)
         {

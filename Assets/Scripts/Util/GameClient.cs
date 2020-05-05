@@ -82,5 +82,10 @@ namespace Assets.Scripts.Util
             byte[] bytes = Encoding.UTF8.GetBytes(json);
             return bytes;
         }
+
+        public void Close()
+        {
+            _udpClient.Close();
+        }
     }
 }

@@ -10,6 +10,7 @@ using System.Threading;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.UI;
+using UnityEngine.UIElements;
 
 public class MatchController : MonoBehaviour
 {
@@ -55,6 +56,11 @@ public class MatchController : MonoBehaviour
         Players.Add(player);
     }
 
+    public void OnDestroy()
+    {
+        GameServer.Close();
+    }
+
     public void PlayCard(Player player, Card card)
     {
         var newPlayer = Players.Where(p => p.Id == player.Id).FirstOrDefault();
@@ -66,12 +72,20 @@ public class MatchController : MonoBehaviour
         {
             PlaceCardInTable(player, card);
             AddWinToWinningPlayer();
-            CurrentPlayer = WinningPlayer;
-            LastPlayer = PreviousPlayer(WinningPlayer);
+            CurrentPlayer = new Player();
             GameServer.UpdateGameState();
             Thread.Sleep(500);
             CardsGone = Table.ToList();
             Table.Clear();
+            GameServer.UpdateGameState();
+            Thread.Sleep(500);
+            CurrentPlayer = WinningPlayer;
+            LastPlayer = PreviousPlayer(CurrentPlayer);
+            if (!Players.Where(p => p.Cards.Count > 0).Any())
+            {
+                RemoveLives();
+                StartRound();
+            }
             GameServer.UpdateGameState();
             Thread.Sleep(500);
         }
@@ -79,13 +93,6 @@ public class MatchController : MonoBehaviour
         {
             PlaceCardInTable(player, card);
             CurrentPlayer = NextPlayer(player);
-            GameServer.UpdateGameState();
-            Thread.Sleep(500);
-        }
-        if (!Players.Where(p => p.Cards.Count > 0).Any())
-        {
-            RemoveLives();
-            StartRound();
             GameServer.UpdateGameState();
             Thread.Sleep(500);
         }
@@ -207,6 +214,14 @@ public class MatchController : MonoBehaviour
         foreach (var player in Players)
         {
             Wins[player] = 0;
+        }
+    }
+
+    public void ZeroGuessesAndWinnins()
+    {
+        foreach (var player in Guesses.Keys)
+        {
+            Guesses[player] = 0;
         }
     }
 
