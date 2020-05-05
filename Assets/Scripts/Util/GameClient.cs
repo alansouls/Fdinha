@@ -27,6 +27,7 @@ namespace Assets.Scripts.Util
         {
             this.serverPort = serverPort;
             _udpClient = new UdpClient(port);
+            MessagesRead = new List<string>();
         }
 
         public void DefineServerEP(IPAddress serverIp)

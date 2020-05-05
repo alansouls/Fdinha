@@ -31,11 +31,17 @@ public class PlayerBehavior : MonoBehaviour
     public Button ReadyButton;
     public Text HostIp;
     public CardBehaviour[] TopCardsTable;
+    public string CurrentCanPlaySprite;
+    public Image CanPlayImage;
+    public Text[] PlayersInfo;
+    public Text PlayerNameText;
 
     // Start is called before the first frame update
     void Start()
     {
         Table = new Stack<Card>();
+        Guesses = new Dictionary<Player, int>();
+        Wins = new Dictionary<Player, int>();
         StartGameButton.gameObject.SetActive(false);
         PlayerCountText.gameObject.SetActive(false);
         CanPlay = false;
@@ -56,10 +62,6 @@ public class PlayerBehavior : MonoBehaviour
             Lives = 3,
             Valid = true
         };
-        foreach (var button in GuessButtons)
-        {
-            button.onClick.AddListener(() => { MakeGuess(GuessButtons.ToList().IndexOf(button)); });
-        }
         StartGameButton.gameObject.SetActive(Host);
         PlayerCountText.gameObject.SetActive(Host);
     }
@@ -89,6 +91,46 @@ public class PlayerBehavior : MonoBehaviour
         VerifyIfCanPlay();
         CheckIfCanPlay();
         ReadyButton.gameObject.SetActive(!IsReady);
+        HandleCanPlaySprite();
+        AdjustPlayersInfo();
+    }
+    
+    public void AdjustPlayersInfo()
+    {
+        var players = Guesses.Keys.ToList();
+        int i = 0;
+        foreach (var player in players)
+        {
+            var playerText = PlayersInfo[i];
+            if (!playerText.gameObject.activeSelf)
+                playerText.gameObject.SetActive(true);
+            playerText.text = $"{player.Name} ({Guesses[player]}/{Wins[player]})";
+            ++i;
+        }
+        for (int j = i; j < PlayersInfo.Count(); j++)
+        {
+            if (PlayersInfo[j].gameObject.activeSelf)
+                PlayersInfo[j].gameObject.SetActive(false);
+        }
+    }
+
+    private void HandleCanPlaySprite()
+    {
+        string canPlaySprite;
+        if (!CanPlay)
+        {
+            canPlaySprite = "bolavermelhatransparente";
+        }
+        else
+        {
+            canPlaySprite = "bolaverdetransparente";
+        }
+        if (canPlaySprite != CurrentCanPlaySprite)
+        {
+            var sprite = Resources.Load<Sprite>($"Bolas/{canPlaySprite}");
+            CanPlayImage.sprite = sprite;
+            CurrentCanPlaySprite = canPlaySprite;
+        }
     }
 
     private void BindTableCards(Card tableCard1, Card tableCard2, Card tableCard3)
@@ -123,6 +165,7 @@ public class PlayerBehavior : MonoBehaviour
 
     public void JoinGame(IPAddress serverIp)
     {
+        Player.Name = PlayerNameText.text;
         GameClient.DefineServerEP(serverIp);
         GameClient.ListenServerUpdates();
         GameClient.SendCommandToServer(new MessageModel

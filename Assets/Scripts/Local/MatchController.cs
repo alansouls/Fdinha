@@ -67,10 +67,13 @@ public class MatchController : MonoBehaviour
             PlaceCardInTable(player, card);
             AddWinToWinningPlayer();
             CurrentPlayer = WinningPlayer;
+            LastPlayer = PreviousPlayer(WinningPlayer);
             GameServer.UpdateGameState();
             Thread.Sleep(500);
             CardsGone = Table.ToList();
             Table.Clear();
+            GameServer.UpdateGameState();
+            Thread.Sleep(500);
         }
         else
         {
@@ -213,7 +216,10 @@ public class MatchController : MonoBehaviour
         {
             var sumGuesses = Guesses.Select(g => g.Value).Sum();
             if (sumGuesses + guess == MaxRound)
+            {
+                GameServer.UpdateGameState();
                 return;
+            }
             else
             {
                 IsGuessing = false;
