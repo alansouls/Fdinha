@@ -93,3 +93,4 @@ crashlytics-build.properties
 #Ignore setup files
 Fdinha/*
 Output/*
+!Fdinha/compileaqui.txt
