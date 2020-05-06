@@ -20,11 +20,11 @@ AppSupportURL={#MyAppURL}
 AppUpdatesURL={#MyAppURL}
 DefaultDirName={autopf}\{#MyAppName}
 DisableProgramGroupPage=yes
-LicenseFile=D:\Documentos\Games\Fdinha\license.txt
+LicenseFile=Fdinha\license.txt
 ; Uncomment the following line to run in non administrative install mode (install for current user only.)
 ;PrivilegesRequired=lowest
 PrivilegesRequiredOverridesAllowed=dialog
-OutputDir=C:\Users\maiaa\Desktop
+OutputDir=Output
 OutputBaseFilename=fdinhasetup
 Compression=lzma
 SolidCompression=yes
@@ -38,12 +38,12 @@ Name: "brazilianportuguese"; MessagesFile: "compiler:Languages\BrazilianPortugue
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
 [Files]
-Source: "D:\Documentos\Games\Fdinha\Fdinha.exe"; DestDir: "{app}"; Flags: ignoreversion
-Source: "D:\Documentos\Games\Fdinha\Fdinha_Data\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "D:\Documentos\Games\Fdinha\MonoBleedingEdge\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "D:\Documentos\Games\Fdinha\UnityCrashHandler64.exe"; DestDir: "{app}"; Flags: ignoreversion
-Source: "D:\Documentos\Games\Fdinha\UnityPlayer.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "D:\Documentos\Games\Fdinha\license.txt"; DestDir: "{app}"; Flags: ignoreversion
+Source: "Fdinha\Fdinha.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "Fdinha\Fdinha_Data\*"; DestDir: "{app}\Fdinha_Data"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "Fdinha\MonoBleedingEdge\*"; DestDir: "{app}\MonoBleedingEdge"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "Fdinha\UnityCrashHandler64.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "Fdinha\UnityPlayer.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "Fdinha\license.txt"; DestDir: "{app}"; Flags: ignoreversion
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]
