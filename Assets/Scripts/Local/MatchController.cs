@@ -26,10 +26,12 @@ public class MatchController : MonoBehaviour
     public IDictionary<Player, int> Wins;
     public GameServer GameServer;
     public List<Card> CardsGone;
+    public System.Random Random;
 
     // Start is called before the first frame update
     void Start()
     {
+        Random = new System.Random();
         GameServer = new GameServer(8965);
         GameServer.MatchController = this;
         GameServer.StartServer();
@@ -291,8 +293,7 @@ public class MatchController : MonoBehaviour
         }
         while (cards.Count > 0)
         {
-            System.Random random = new System.Random();
-            var pos = random.Next(0, cards.Count - 1);
+            var pos = Random.Next(0, cards.Count - 1);
             Cards.Push(cards.ElementAt(pos));
             cards.RemoveAt(pos);
         }
@@ -304,8 +305,8 @@ public class MatchController : MonoBehaviour
         Cards.Clear();
         while (cards.Count > 0)
         {
-            System.Random random = new System.Random();
-            var pos = random.Next(0, cards.Count - 1);
+            var pos = Random.Next(0, cards.Count - 1);
+            Debug.Log(cards.ElementAt(pos).Value + "-" + cards.ElementAt(pos).Suit);
             Cards.Push(cards.ElementAt(pos));
             cards.RemoveAt(pos);
         }
