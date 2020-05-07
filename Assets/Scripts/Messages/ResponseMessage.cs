@@ -25,5 +25,7 @@ namespace Assets.Scripts.Local
         public List<Card> Table;
 
         public List<GameState> GameStates;
+
+        public List<Player> Players;
     }
 }

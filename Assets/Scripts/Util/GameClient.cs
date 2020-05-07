@@ -63,6 +63,7 @@ namespace Assets.Scripts.Util
             MessagesRead.Add(message.Id);
             Player.Guesses = GameState.GuessesDictionary(message.GameStates);
             Player.Wins = GameState.WinsDictionary(message.GameStates);
+            Player.Players = message.Players;
             Player.Table = message.Table.ToStack();
             Player.CanPlay = message.CanPlay;
             Player.GuessingRound = message.GuessingRound;

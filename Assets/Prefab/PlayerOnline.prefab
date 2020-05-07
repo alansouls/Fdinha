@@ -1396,6 +1396,7 @@ MonoBehaviour:
   - {fileID: 4632849559760457195}
   - {fileID: 4632849559859397277}
   - {fileID: 4632849559712137619}
+  Players: []
   CanPlay: 0
   GuessingRound: 0
   Host: 1
@@ -1743,7 +1744,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7423000005284286903}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 280.92, y: -425.66, z: 0}
+  m_LocalPosition: {x: 280.92, y: -426.19, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 8917925415460001581}

@@ -82,16 +82,7 @@ namespace Assets.Scripts.Util
         {
             MatchController.AddPlayer(action.Player);
             PlayersIps.Add(action.Player, groupEP);
-            var response = new ResponseMessage
-            {
-                Id = Guid.NewGuid().ToString(),
-                CanPlay = false,
-                GuessingRound = true,
-                AdjustPlayer = false,
-            };
-            var json = JsonUtility.ToJson(response);
-            byte[] bytes = Encoding.UTF8.GetBytes(json);
-            _udpClient.Send(bytes, bytes.Length, groupEP);
+            UpdateGameState();
         }
 
         public void Guess(ActionObject action, IPEndPoint groupEP)
@@ -127,7 +118,8 @@ namespace Assets.Scripts.Util
                     Table = MatchController.Table.ToList(),
                     CanPlay = p == MatchController.CurrentPlayer,
                     AdjustPlayer = true,
-                    Player = MatchController.Players.Where(x => x.Id == p.Id).FirstOrDefault()
+                    Player = MatchController.Players.Where(x => x.Id == p.Id).FirstOrDefault(),
+                    Players = MatchController.Players
                 };
                 var bytes = GetMessageBytes(message);
                 _udpClient.Send(bytes, bytes.Length, PlayersIps[p]);

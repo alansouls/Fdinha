@@ -20,8 +20,9 @@ public class PlayerBehavior : MonoBehaviour
     public CardBehaviour Card3;
     public Button[] GuessButtons;
     public Stack<Card> Table { get; set; }
-    public IDictionary<Player, int> Guesses { get; set; }
-    public IDictionary<Player, int> Wins { get; set; }
+    public IDictionary<Player, int> Guesses;
+    public IDictionary<Player, int> Wins;
+    public List<Player> Players;
     public bool CanPlay;
     public bool GuessingRound;
     public GameClient GameClient;
@@ -40,6 +41,7 @@ public class PlayerBehavior : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        Players = new List<Player>();
         Table = new Stack<Card>();
         Guesses = new Dictionary<Player, int>();
         Wins = new Dictionary<Player, int>();
@@ -70,11 +72,6 @@ public class PlayerBehavior : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (CanPlay == true && Player.Cards.Count == 0)
-        {
-            CanPlay = false;
-            Pass();
-        }
         var card1 = Player.Cards.ElementAtOrDefault(0);
         var card2 = Player.Cards.ElementAtOrDefault(1);
         var card3 = Player.Cards.ElementAtOrDefault(2);
@@ -108,14 +105,18 @@ public class PlayerBehavior : MonoBehaviour
     
     public void AdjustPlayersInfo()
     {
-        var players = Wins.Keys.ToList();
+        var players = Players.ToList();
         int i = 0;
         foreach (var player in players)
         {
             var playerText = PlayersInfo[i];
+            if (!Guesses.TryGetValue(player, out int guess))
+                guess = 0;
+            if (!Wins.TryGetValue(player, out int wins))
+                wins = 0;
             if (!playerText.gameObject.activeSelf)
                 playerText.gameObject.SetActive(true);
-            playerText.text = $"{player.Name} ({Guesses[player]}/{Wins[player]})";
+            playerText.text = $"{player.Name} ({guess}/{wins})";
             ++i;
         }
         for (int j = i; j < PlayersInfo.Count(); j++)

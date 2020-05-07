@@ -24,7 +24,6 @@ public class MatchController : MonoBehaviour
     public Player LastPlayer;
     public IDictionary<Player, int> Guesses;
     public IDictionary<Player, int> Wins;
-    public Text PlayerCountText;
     public GameServer GameServer;
     public List<Card> CardsGone;
 
@@ -106,7 +105,10 @@ public class MatchController : MonoBehaviour
 
     public void Pass(Player player)
     {
-        CurrentPlayer = NextPlayer(player);
+        if (player.Cards.Count <= 0)
+            CurrentPlayer = NextPlayer(player);
+        else
+            CurrentPlayer = player;
         GameServer.UpdateGameState();
     }
 
@@ -211,9 +213,11 @@ public class MatchController : MonoBehaviour
     private void MountWinsDictionary()
     {
         Wins.Clear();
+        Guesses.Clear();
         foreach (var player in Players)
         {
             Wins[player] = 0;
+            Guesses[player] = 0;
         }
     }
 
