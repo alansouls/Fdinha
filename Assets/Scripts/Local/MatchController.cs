@@ -5,6 +5,7 @@ using Assets.Scripts.Util;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Threading;
 using UnityEngine;
@@ -191,11 +192,23 @@ public class MatchController : MonoBehaviour
         ShuffleDeck();
     }
 
+    public void ResetPlayerLives()
+    {
+        foreach (var player in Players.ToList())
+        {
+            var newPlayer = player;
+            newPlayer.Lives = 3;
+            newPlayer.Cards.Clear();
+            Players.Remove(newPlayer);
+            Players.Add(newPlayer);
+        }
+    }
+
     public void StartGame()
     {
+        ResetPlayerLives();
         StartRound();
-        System.Random rnd = new System.Random();
-        var position = rnd.Next(0, Players.Count - 1);
+        var position = Random.Next(0, Players.Count - 1);
         CurrentPlayer = Players[position];
         LastPlayer = Players.ElementAtOrDefault(position - 1).Valid ? Players.ElementAtOrDefault(position - 1) : Players.Last();
         GameServer.UpdateGameState();
