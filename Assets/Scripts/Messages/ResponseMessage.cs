@@ -1,13 +1,8 @@
-﻿using Assets.Scripts.Entites;
-using Assets.Scripts.Entities;
+﻿using FdinhaServer.Entities;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Assets.Scripts.Local
+namespace FdinhaServer.Messages
 {
     [Serializable]
     public class ResponseMessage

@@ -31,4 +31,9 @@ public class MenuBehaviour : MonoBehaviour
     {
         SceneManager.LoadScene("GuestScene");
     }
+
+    public void RoomScene()
+    {
+        SceneManager.LoadScene("RoomScene");
+    }
 }
