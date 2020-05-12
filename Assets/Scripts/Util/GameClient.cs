@@ -87,10 +87,10 @@ namespace Assets.Scripts.Util
         {
             var msgStr = "GET_ROOMS";
             var msgBytes = Encoding.UTF8.GetBytes(msgStr);
-            _udpClient.Send(msgBytes, msgBytes.Length);
+            _udpClient.Send(msgBytes, msgBytes.Length, ServerEP);
             var bytes = _udpClient.Receive(ref ServerEP);
             var json = Encoding.UTF8.GetString(bytes, 0, bytes.Length);
-            var rooms = JsonUtility.FromJson<ServerRoom[]>(json);
+            var rooms = JsonUtility.FromJson<ServerList>(json).ServerRooms;
             return rooms.ToList();
         }
 

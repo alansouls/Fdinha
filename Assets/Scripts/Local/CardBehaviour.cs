@@ -1,7 +1,4 @@
-﻿using Assets.Scripts.Entites;
-using System.Collections;
-using System.Collections.Generic;
-using System.Runtime.InteropServices.WindowsRuntime;
+﻿using FdinhaServer.Entities;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -72,13 +69,13 @@ public class CardBehaviour : MonoBehaviour
     {
         switch (Card.Suit)
         {
-            case Assets.Scripts.Enums.Suit.CLUBS:
+            case Suit.CLUBS:
                 return "c";
-            case Assets.Scripts.Enums.Suit.DIAMONDS:
+            case Suit.DIAMONDS:
                 return "d";
-            case Assets.Scripts.Enums.Suit.HEARTS:
+            case Suit.HEARTS:
                 return "h";
-            case Assets.Scripts.Enums.Suit.SPADES:
+            case Suit.SPADES:
                 return "s";
             default:
                 return "c";
