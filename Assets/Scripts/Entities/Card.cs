@@ -1,12 +1,6 @@
-﻿using Assets.Scripts.Enums;
-using JetBrains.Annotations;
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Runtime.InteropServices.ComTypes;
-using UnityEngine;
+﻿using System;
 
-namespace Assets.Scripts.Entites
+namespace FdinhaServer.Entities
 {
     [Serializable]
     public struct Card

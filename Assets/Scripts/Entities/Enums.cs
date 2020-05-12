@@ -1,4 +1,4 @@
-﻿namespace Assets.Scripts.Enums
+﻿namespace FdinhaServer.Entities
 {
     public enum Suit
     {
@@ -14,6 +14,7 @@
         GUESS,
         PLAY_CARD,
         ADD_PLAYER,
-        START_GAME
+        START_GAME,
+        CREATE_ROOM
     }
 }

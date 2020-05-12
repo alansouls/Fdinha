@@ -1,13 +1,10 @@
-﻿using Assets.Scripts.Entites;
-using Assets.Scripts.Local;
-using Assets.Scripts.Messages;
-using Assets.Scripts.Util;
+﻿using Assets.Scripts.Util;
+using FdinhaServer.Entities;
+using FdinhaServer.Messages;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using System.Text.RegularExpressions;
-using System.Threading;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -185,7 +182,7 @@ public class PlayerBehavior : MonoBehaviour
             MessageId = Guid.NewGuid().ToString(),
             Action = new ActionObject
             {
-                Action = Assets.Scripts.Enums.Action.ADD_PLAYER,
+                Action = FdinhaServer.Entities.Action.ADD_PLAYER,
                 Player = Player
             }
         });
@@ -199,7 +196,7 @@ public class PlayerBehavior : MonoBehaviour
             MessageId = Guid.NewGuid().ToString(),
             Action = new ActionObject
             {
-                Action = Assets.Scripts.Enums.Action.PASS,
+                Action = FdinhaServer.Entities.Action.PASS,
                 Player = Player
             }
         });
@@ -220,7 +217,7 @@ public class PlayerBehavior : MonoBehaviour
                 MessageId = Guid.NewGuid().ToString(),
                 Action = new ActionObject
                 {
-                    Action = Assets.Scripts.Enums.Action.PASS,
+                    Action = FdinhaServer.Entities.Action.PASS,
                     Player = Player
                 }
             });
@@ -258,7 +255,7 @@ public class PlayerBehavior : MonoBehaviour
             MessageId = Guid.NewGuid().ToString(),
             Action = new ActionObject
             {
-                Action = Assets.Scripts.Enums.Action.GUESS,
+                Action = FdinhaServer.Entities.Action.GUESS,
                 Guess = guess,
                 Player = Player
             }
@@ -308,7 +305,7 @@ public class PlayerBehavior : MonoBehaviour
             MessageId = Guid.NewGuid().ToString(),
             Action = new ActionObject
             {
-                Action = Assets.Scripts.Enums.Action.PLAY_CARD,
+                Action = FdinhaServer.Entities.Action.PLAY_CARD,
                 Player = Player,
                 Card = cardToRemove,
             }
@@ -388,7 +385,7 @@ public class PlayerBehavior : MonoBehaviour
             MessageId = Guid.NewGuid().ToString(),
             Action = new ActionObject
             {
-                Action = Assets.Scripts.Enums.Action.START_GAME,
+                Action = FdinhaServer.Entities.Action.START_GAME,
             }
         });
     }

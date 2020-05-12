@@ -1,7 +1,6 @@
-﻿using Assets.Scripts.Entities;
-using Assets.Scripts.Extensions;
-using Assets.Scripts.Local;
-using Assets.Scripts.Messages;
+﻿using Assets.Scripts.Extensions;
+using FdinhaServer.Entities;
+using FdinhaServer.Messages;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -82,6 +81,17 @@ namespace Assets.Scripts.Util
             var json = JsonUtility.ToJson(message);
             byte[] bytes = Encoding.UTF8.GetBytes(json);
             return bytes;
+        }
+
+        public List<ServerRoom> GetServerRooms()
+        {
+            var msgStr = "GET_ROOMS";
+            var msgBytes = Encoding.UTF8.GetBytes(msgStr);
+            _udpClient.Send(msgBytes, msgBytes.Length);
+            var bytes = _udpClient.Receive(ref ServerEP);
+            var json = Encoding.UTF8.GetString(bytes, 0, bytes.Length);
+            var rooms = JsonUtility.FromJson<ServerRoom[]>(json);
+            return rooms.ToList();
         }
 
         public void Close()

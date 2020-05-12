@@ -1,13 +1,11 @@
-﻿using Assets.Scripts.Entities;
-using Assets.Scripts.Local;
-using Assets.Scripts.Messages;
+﻿using FdinhaServer.Entities;
+using FdinhaServer.Messages;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
-using System.Threading;
 using UnityEngine;
 
 namespace Assets.Scripts.Util
@@ -55,19 +53,19 @@ namespace Assets.Scripts.Util
             var action = message.Action;
             switch (message.Action.Action)
             {
-                case Enums.Action.ADD_PLAYER:
+                case FdinhaServer.Entities.Action.ADD_PLAYER:
                     AddPlayer(action, groupEP);
                     break;
-                case Enums.Action.GUESS:
+                case FdinhaServer.Entities.Action.GUESS:
                     Guess(action, groupEP);
                     break;
-                case Enums.Action.PASS:
+                case FdinhaServer.Entities.Action.PASS:
                     Pass(action, groupEP);
                     break;
-                case Enums.Action.PLAY_CARD:
+                case FdinhaServer.Entities.Action.PLAY_CARD:
                     PlayCard(action, groupEP);
                     break;
-                case Enums.Action.START_GAME:
+                case FdinhaServer.Entities.Action.START_GAME:
                     StartGame(action, groupEP);
                     break;
             }
