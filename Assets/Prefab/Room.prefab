@@ -281,6 +281,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ad77975cf89738346a980908a658f525, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Room:
+    Name: 
+    Password: 
+    Open: 0
 --- !u!1 &2218022176399525266
 GameObject:
   m_ObjectHideFlags: 0
@@ -399,4 +403,15 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 2218022176399525265}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 3070915247566673593}
+        m_MethodName: JoinGame
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2

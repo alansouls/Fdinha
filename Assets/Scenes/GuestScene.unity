@@ -346,6 +346,11 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1802305491176297086, guid: 42ef431cf52514f4bb0cb29767159c48,
+        type: 3}
+      propertyPath: m_RootOrder
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 2639170392497829217, guid: 42ef431cf52514f4bb0cb29767159c48,
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
@@ -476,6 +481,11 @@ PrefabInstance:
       propertyPath: TopCardsTable.Array.data[2]
       value: 
       objectReference: {fileID: 1003464099}
+    - target: {fileID: 6004673086817215236, guid: 42ef431cf52514f4bb0cb29767159c48,
+        type: 3}
+      propertyPath: InputIp
+      value: 
+      objectReference: {fileID: 238235247}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 42ef431cf52514f4bb0cb29767159c48, type: 3}
 --- !u!114 &1003464099 stripped
