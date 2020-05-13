@@ -1,4 +1,5 @@
-﻿using FdinhaServer.Entities;
+﻿using Assets.Scripts.Util;
+using FdinhaServer.Entities;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -10,7 +11,6 @@ public class RoomBehaviour : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        DontDestroyOnLoad(gameObject);
     }
 
     // Update is called once per frame
@@ -21,5 +21,13 @@ public class RoomBehaviour : MonoBehaviour
         {
             gameObject.SetActive(false);
         }
+    }
+
+    public void JoinGame()
+    {
+        GameStatus.IsDedicated = true;
+        GameStatus.IsHost = false;
+        GameStatus.ServerRoom = Room;
+        SceneManager.LoadScene("GuestScene");
     }
 }

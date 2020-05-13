@@ -24,7 +24,6 @@ public class RoomControllerBehaviour : MonoBehaviour
         {
             ServerEP = new IPEndPoint(IPAddress.Parse(ServerIp), 8965)
         };
-        DontDestroyOnLoad(gameObject);
     }
 
     // Update is called once per frame

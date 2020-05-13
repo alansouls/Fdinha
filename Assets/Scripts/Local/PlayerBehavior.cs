@@ -1,6 +1,7 @@
 ﻿using Assets.Scripts.Util;
 using FdinhaServer.Entities;
 using FdinhaServer.Messages;
+using JetBrains.Annotations;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -34,10 +35,21 @@ public class PlayerBehavior : MonoBehaviour
     public Image CanPlayImage;
     public Text[] PlayersInfo;
     public Text PlayerNameText;
+    public ServerRoom Room;
+    public GameObject InputName;
+    public GameObject InputIp;
 
     // Start is called before the first frame update
     void Start()
     {
+        if (GameStatus.IsDedicated)
+        {
+            Room = GameStatus.ServerRoom;
+            if (InputIp != null)
+                InputIp.SetActive(false);
+            InputName.SetActive(false);
+            Host = GameStatus.IsHost;
+        }
         Players = new List<Player>();
         Table = new Stack<Card>();
         Guesses = new Dictionary<Player, int>();
@@ -162,7 +174,7 @@ public class PlayerBehavior : MonoBehaviour
 
     public void JoinGame()
     {
-        bool valid = IPAddress.TryParse(HostIp.text, out IPAddress ip);
+        bool valid = IPAddress.TryParse(GameStatus.ServerIp, out IPAddress ip);
 
         if (valid)
             JoinGame(ip);
@@ -183,7 +195,8 @@ public class PlayerBehavior : MonoBehaviour
             Action = new ActionObject
             {
                 Action = FdinhaServer.Entities.Action.ADD_PLAYER,
-                Player = Player
+                Player = Player,
+                Room = Room
             }
         });
         IsReady = true;
@@ -197,7 +210,8 @@ public class PlayerBehavior : MonoBehaviour
             Action = new ActionObject
             {
                 Action = FdinhaServer.Entities.Action.PASS,
-                Player = Player
+                Player = Player,
+                Room = Room
             }
         });
     }
@@ -218,7 +232,8 @@ public class PlayerBehavior : MonoBehaviour
                 Action = new ActionObject
                 {
                     Action = FdinhaServer.Entities.Action.PASS,
-                    Player = Player
+                    Player = Player,
+                    Room = Room
                 }
             });
         }
@@ -257,7 +272,8 @@ public class PlayerBehavior : MonoBehaviour
             {
                 Action = FdinhaServer.Entities.Action.GUESS,
                 Guess = guess,
-                Player = Player
+                Player = Player,
+                Room = Room
             }
         });
     }
@@ -308,6 +324,7 @@ public class PlayerBehavior : MonoBehaviour
                 Action = FdinhaServer.Entities.Action.PLAY_CARD,
                 Player = Player,
                 Card = cardToRemove,
+                Room = Room
             }
         });
     }
@@ -386,6 +403,7 @@ public class PlayerBehavior : MonoBehaviour
             Action = new ActionObject
             {
                 Action = FdinhaServer.Entities.Action.START_GAME,
+                Room = Room
             }
         });
     }

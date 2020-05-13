@@ -1420,6 +1420,12 @@ MonoBehaviour:
   - {fileID: 4368339688925926824}
   - {fileID: 8719716390139904326}
   PlayerNameText: {fileID: 824905620610801787}
+  Room:
+    Name: 
+    Password: 
+    Open: 0
+  InputName: {fileID: 889193836307348411}
+  InputIp: {fileID: 0}
 --- !u!114 &7190885241989008371
 MonoBehaviour:
   m_ObjectHideFlags: 0
