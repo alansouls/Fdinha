@@ -74,6 +74,8 @@ public class PlayerBehavior : MonoBehaviour
             Lives = 3,
             Valid = true
         };
+        if (GameStatus.IsDedicated)
+            Player.Name = GameStatus.PlayerName;
         StartGameButton.gameObject.SetActive(Host);
         PlayerCountText.gameObject.SetActive(Host);
     }
@@ -186,7 +188,8 @@ public class PlayerBehavior : MonoBehaviour
 
     public void JoinGame(IPAddress serverIp)
     {
-        Player.Name = PlayerNameText.text;
+        if (!GameStatus.IsDedicated)
+            Player.Name = PlayerNameText.text;
         GameClient.DefineServerEP(serverIp);
         GameClient.ListenServerUpdates();
         GameClient.SendCommandToServer(new MessageModel

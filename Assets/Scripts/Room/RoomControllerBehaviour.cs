@@ -1,8 +1,10 @@
 ﻿using Assets.Scripts.Util;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class RoomControllerBehaviour : MonoBehaviour
 {
@@ -11,7 +13,7 @@ public class RoomControllerBehaviour : MonoBehaviour
     const float w = 476.5123f;
     const float h = 49.25342f;
     const float distance = 5f;
-    const string ServerIp = "127.0.0.1";
+    const string ServerIp = GameStatus.ServerIp;
     public RoomBehaviour[] Rooms;
     public GameClient GameClient;
     public RoomBehaviour RoomPrefab;
