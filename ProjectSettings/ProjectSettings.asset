@@ -668,11 +668,11 @@ PlayerSettings:
   m_MobileRenderingPath: 1
   metroPackageName: Template_2D
   metroPackageVersion: 
-  metroCertificatePath: 
+  metroCertificatePath: D:\Documentos\Pessoal\Fdinha\Assets\WSATestCertificate.pfx
   metroCertificatePassword: 
-  metroCertificateSubject: 
-  metroCertificateIssuer: 
-  metroCertificateNotAfter: 0000000000000000
+  metroCertificateSubject: Alan Company
+  metroCertificateIssuer: Alan Company
+  metroCertificateNotAfter: 803859cd9ee9d701
   metroApplicationDescription: Template_2D
   wsaImages: {}
   metroTileShortName: 

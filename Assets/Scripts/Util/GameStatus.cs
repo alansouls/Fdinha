@@ -15,6 +15,8 @@ namespace Assets.Scripts.Util
 
         public static ServerRoom ServerRoom = null;
 
-        public const string ServerIp = "127.0.0.1";
+        public const string ServerIp = "191.232.242.228";
+
+        public static string PlayerName;
     }
 }
