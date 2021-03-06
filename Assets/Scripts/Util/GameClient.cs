@@ -88,10 +88,19 @@ namespace Assets.Scripts.Util
             var msgStr = "GET_ROOMS";
             var msgBytes = Encoding.UTF8.GetBytes(msgStr);
             _udpClient.Send(msgBytes, msgBytes.Length, ServerEP);
-            var bytes = _udpClient.Receive(ref ServerEP);
-            var json = Encoding.UTF8.GetString(bytes, 0, bytes.Length);
-            var rooms = JsonUtility.FromJson<ServerList>(json).ServerRooms;
-            return rooms.ToList();
+            _udpClient.Client.ReceiveTimeout = 5000;
+            try
+            {
+                var bytes = _udpClient.Receive(ref ServerEP);
+                var json = Encoding.UTF8.GetString(bytes, 0, bytes.Length);
+                var rooms = JsonUtility.FromJson<ServerList>(json).ServerRooms;
+                return rooms.ToList();
+            }
+            catch (Exception e)
+            {
+                Debug.LogError(e);
+                return new List<ServerRoom>();
+            }
         }
 
         public void Close()
