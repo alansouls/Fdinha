@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -15,8 +16,16 @@ namespace Assets.Scripts.Util
 
         public static ServerRoom ServerRoom = null;
 
-        public const string ServerIp = "127.0.0.1";
+        public const string ServerHostName = "servercsgoclub01.brazilsouth.cloudapp.azure.com";
 
         public static string PlayerName;
+
+        public static IPAddress ServerIP 
+        {
+            get
+            {
+                return Dns.GetHostEntry(ServerHostName).AddressList.FirstOrDefault();
+            } 
+        }
     }
 }

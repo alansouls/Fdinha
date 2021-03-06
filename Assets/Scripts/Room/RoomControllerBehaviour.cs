@@ -13,7 +13,6 @@ public class RoomControllerBehaviour : MonoBehaviour
     const float w = 476.5123f;
     const float h = 49.25342f;
     const float distance = 5f;
-    const string ServerIp = GameStatus.ServerIp;
     public RoomBehaviour[] Rooms;
     public GameClient GameClient;
     public RoomBehaviour RoomPrefab;
@@ -24,7 +23,7 @@ public class RoomControllerBehaviour : MonoBehaviour
         var random = new System.Random();
         GameClient = new GameClient(random.Next(7779, 7999), 8965)
         {
-            ServerEP = new IPEndPoint(IPAddress.Parse(ServerIp), 8965)
+            ServerEP = new IPEndPoint(GameStatus.ServerIP, 8965)
         };
     }
 
