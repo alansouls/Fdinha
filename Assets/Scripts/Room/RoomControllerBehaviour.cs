@@ -41,6 +41,7 @@ public class RoomControllerBehaviour : MonoBehaviour
 
     public void RefreshRooms()
     {
+        ClearRooms();
         var rooms = GameClient.GetServerRooms();
         Rooms = new RoomBehaviour[rooms.Count];
         var currentY = y;
@@ -54,5 +55,11 @@ public class RoomControllerBehaviour : MonoBehaviour
             currentY -= (h + distance);
             room.Room = rooms[i];
         }
+    }
+
+    private void ClearRooms()
+    {
+        foreach (var room in Rooms)
+            Destroy(room.gameObject);
     }
 }
