@@ -42,6 +42,7 @@ public class PlayerBehavior : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        var random = new System.Random();
         if (GameStatus.IsDedicated)
         {
             Room = GameStatus.ServerRoom;
@@ -58,15 +59,10 @@ public class PlayerBehavior : MonoBehaviour
         PlayerCountText.gameObject.SetActive(false);
         CanPlay = false;
         GuessingRound = true;
-        if (Host)
+        GameClient = new GameClient(random.Next(7779, 7999), 8965)
         {
-            GameClient = new GameClient(7777, 8965);
-        }
-        else
-        {
-            GameClient = new GameClient(7778, 8965);
-        }
-        GameClient.Player = this;
+            Player = this
+        };
         Player = new Player
         {
             Id = Guid.NewGuid().ToString(),
@@ -176,9 +172,8 @@ public class PlayerBehavior : MonoBehaviour
 
     public void JoinGame()
     {
-        bool valid = IPAddress.TryParse(GameStatus.ServerIp, out IPAddress ip);
-
-        if (valid)
+        var ip = GameStatus.ServerIP;
+        if (ip != null)
             JoinGame(ip);
         else
         {
