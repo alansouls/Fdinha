@@ -16,7 +16,7 @@ namespace Assets.Scripts.Util
 
         public static ServerRoom ServerRoom = null;
 
-        public const string ServerHostName = "servercsgoclub01.brazilsouth.cloudapp.azure.com";
+        public const string ServerHostName = "127.0.0.1";
 
         public static string PlayerName;
 
@@ -24,7 +24,11 @@ namespace Assets.Scripts.Util
         {
             get
             {
-                return Dns.GetHostEntry(ServerHostName).AddressList.FirstOrDefault();
+                var isIP = IPAddress.TryParse(ServerHostName, out IPAddress iPAddress);
+                if (isIP)
+                    return iPAddress;
+                else 
+                    return Dns.GetHostEntry(ServerHostName).AddressList.FirstOrDefault();
             } 
         }
     }

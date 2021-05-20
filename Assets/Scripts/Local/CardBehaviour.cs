@@ -4,6 +4,7 @@ using UnityEngine.UI;
 
 public class CardBehaviour : MonoBehaviour
 {
+    private const float defaultScale = 0.64654f;
     public Card Card;
     public Button PlayCardButton;
     public Button CancellCardButton;
@@ -28,7 +29,15 @@ public class CardBehaviour : MonoBehaviour
             var sprite = Resources.Load<Sprite>($"Cards/{spriteName}");
             Renderer.sprite = sprite;
             SpriteName = spriteName;
+            ScaleWithSprite(sprite.rect, 390, 606, sprite.pixelsPerUnit);
         }
+    }
+
+    private void ScaleWithSprite(Rect spriteRect, int baseWidth, int baseHeight, float pixelsPerUnit)
+    {
+        var widthRatio = baseWidth / spriteRect.width * defaultScale;
+        var heightRatio = baseHeight / spriteRect.height * defaultScale;
+        gameObject.transform.localScale = new Vector3(widthRatio, heightRatio, 1);
     }
 
     public string GetCardSpriteName()
